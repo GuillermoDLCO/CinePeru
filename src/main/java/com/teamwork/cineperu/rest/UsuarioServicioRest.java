@@ -1,12 +1,7 @@
 package com.teamwork.cineperu.rest;
 
-import com.teamwork.cineperu.entidad.request.RegisterUserRequest;
-import com.teamwork.cineperu.entidad.request.UserAuthenticateRequest;
-import com.teamwork.cineperu.entidad.request.UserTokenRequest;
-import com.teamwork.cineperu.entidad.response.EntityWSBase;
-import com.teamwork.cineperu.entidad.response.GetListMovieResponse;
-import com.teamwork.cineperu.entidad.response.GetListTriviaResponse;
-import com.teamwork.cineperu.entidad.response.UserAuthenticateResponse;
+import com.teamwork.cineperu.entidad.request.*;
+import com.teamwork.cineperu.entidad.response.*;
 import com.teamwork.cineperu.negocio.PeliculaNegocio;
 import com.teamwork.cineperu.negocio.PersonaUsuarioNegocio;
 import com.teamwork.cineperu.negocio.TriviaNegocio;
@@ -44,5 +39,15 @@ public class UsuarioServicioRest {
     @PostMapping("/WS_GetListTrivia")
     public GetListTriviaResponse WS_GetListTrivia(@RequestBody UserTokenRequest userTokenRequest){
         return triviaNegocio.listarTrivia(userTokenRequest);
+    }
+
+    @PostMapping("/WS_RegisterIntentTrivia")
+    public RegisterIntentTriviaResponse WS_RegisterIntentTrivia(@RequestBody RegisterIntentTriviaRequest registerIntentTriviaRequest){
+        return triviaNegocio.registrarIntentoTrivia(registerIntentTriviaRequest);
+    }
+
+    @PostMapping("/WS_GetTriviaUser")
+    public RegisterIntentTriviaResponse WS_GetTriviaUser(@RequestBody GetTriviaUsuarioRequest getTriviaUsuarioRequest){
+        return triviaNegocio.obtenerTriviaUsuario(getTriviaUsuarioRequest);
     }
 }

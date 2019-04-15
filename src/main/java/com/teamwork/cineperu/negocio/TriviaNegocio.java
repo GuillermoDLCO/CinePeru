@@ -2,14 +2,17 @@ package com.teamwork.cineperu.negocio;
 
 import com.teamwork.cineperu.bean.BeanTriviaPregunta;
 import com.teamwork.cineperu.bean.BeanTriviaRespuesta;
-import com.teamwork.cineperu.entidad.Trivia;
-import com.teamwork.cineperu.entidad.TriviaDetalle;
-import com.teamwork.cineperu.entidad.TriviaDetalleRespuesta;
+import com.teamwork.cineperu.entidad.*;
+import com.teamwork.cineperu.entidad.request.GetTriviaUsuarioRequest;
+import com.teamwork.cineperu.entidad.request.RegisterIntentTriviaRequest;
 import com.teamwork.cineperu.entidad.request.UserTokenRequest;
+import com.teamwork.cineperu.entidad.response.EntityWSBase;
 import com.teamwork.cineperu.entidad.response.GetListTriviaResponse;
+import com.teamwork.cineperu.entidad.response.RegisterIntentTriviaResponse;
 import com.teamwork.cineperu.repositorio.TriviaDetalleRepositorio;
 import com.teamwork.cineperu.repositorio.TriviaDetalleRespuestaRepositorio;
 import com.teamwork.cineperu.repositorio.TriviaRepositorio;
+import com.teamwork.cineperu.repositorio.TriviaUsuarioRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +32,16 @@ public class TriviaNegocio {
     private TriviaDetalleRespuestaRepositorio triviaDetalleRespuestaRepositorio;
     @Autowired
     private UsuarioTokenNegocio usuarioTokenNegocio;
+    @Autowired
+    private TriviaUsuarioRepositorio triviaUsuarioRepositorio;
 
     public GetListTriviaResponse listarTrivia(UserTokenRequest userTokenRequest){
         GetListTriviaResponse getListTriviaResponse = new GetListTriviaResponse();
         getListTriviaResponse.setErrorCode(0);
         getListTriviaResponse.setErrorMessage("");
         try{
-
-            if (!usuarioTokenNegocio.validarToken(userTokenRequest)){
+            UsuarioToken usuarioToken = usuarioTokenNegocio.obtenerUsuarioToken(userTokenRequest.getToken());
+            if (usuarioToken == null){
                 getListTriviaResponse.setErrorCode(100);
                 getListTriviaResponse.setErrorMessage("Credencial de acceso vencida o incorrecta");
                 return getListTriviaResponse;
@@ -84,4 +89,69 @@ public class TriviaNegocio {
         return getListTriviaResponse;
     }
 
+    public RegisterIntentTriviaResponse registrarIntentoTrivia(RegisterIntentTriviaRequest registerIntentTriviaRequest) {
+        RegisterIntentTriviaResponse registerIntentTriviaResponse = new RegisterIntentTriviaResponse();
+        registerIntentTriviaResponse.setErrorCode(0);
+        registerIntentTriviaResponse.setErrorMessage("");
+        try{
+            UsuarioToken usuarioToken = usuarioTokenNegocio.obtenerUsuarioToken(registerIntentTriviaRequest.getToken());
+            if (usuarioToken == null){
+                registerIntentTriviaResponse.setErrorCode(100);
+                registerIntentTriviaResponse.setErrorMessage("Credencial de acceso vencida o incorrecta");
+                return registerIntentTriviaResponse;
+            }
+
+            Trivia trivia = new Trivia();
+            trivia.setCodigoTrivia(registerIntentTriviaRequest.getCodigoTrivia());
+
+            TriviaUsuario triviaUsuario = new TriviaUsuario();
+            triviaUsuario.setTrivia(trivia);
+            triviaUsuario.setUsuario(usuarioToken.getUsuario());
+            triviaUsuario.setEstadoCobro(false);
+            triviaUsuario.setEstadoRespuesta(registerIntentTriviaRequest.estadoRespuesta);
+
+            triviaUsuario = triviaUsuarioRepositorio.save(triviaUsuario);
+            if (triviaUsuario != null){
+                registerIntentTriviaResponse.setCodigoTriviaUsuario(triviaUsuario.getCodigoTriviaUsuario());
+                registerIntentTriviaResponse.setEstadoRespuesta(triviaUsuario.isEstadoRespuesta());
+                registerIntentTriviaResponse.setEstadoCobro(triviaUsuario.isEstadoCobro());
+            }else{
+                registerIntentTriviaResponse.setErrorCode(7);
+                registerIntentTriviaResponse.setErrorMessage("No se pudo registrar el intento de trivia del usuario");
+                return registerIntentTriviaResponse;
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            registerIntentTriviaResponse.setErrorCode(1);
+            registerIntentTriviaResponse.setErrorMessage("Error en procesos");
+        }
+        return registerIntentTriviaResponse;
+    }
+
+    public RegisterIntentTriviaResponse obtenerTriviaUsuario(GetTriviaUsuarioRequest getTriviaUsuarioRequest) {
+        RegisterIntentTriviaResponse registerIntentTriviaResponse = new RegisterIntentTriviaResponse();
+        registerIntentTriviaResponse.setErrorCode(0);
+        registerIntentTriviaResponse.setErrorMessage("");
+        try{
+            UsuarioToken usuarioToken = usuarioTokenNegocio.obtenerUsuarioToken(getTriviaUsuarioRequest.getToken());
+            if (usuarioToken == null){
+                registerIntentTriviaResponse.setErrorCode(100);
+                registerIntentTriviaResponse.setErrorMessage("Credencial de acceso vencida o incorrecta");
+                return registerIntentTriviaResponse;
+            }
+
+            TriviaUsuario triviaUsuario = triviaUsuarioRepositorio.buscarPorTriviaYUsuario(
+                    usuarioToken.getUsuario().getCodigoUsuario(),getTriviaUsuarioRequest.getCodigoTrivia());
+            if (triviaUsuario != null){
+                registerIntentTriviaResponse.setCodigoTriviaUsuario(triviaUsuario.getCodigoTriviaUsuario());
+                registerIntentTriviaResponse.setEstadoRespuesta(triviaUsuario.isEstadoRespuesta());
+                registerIntentTriviaResponse.setEstadoCobro(triviaUsuario.isEstadoCobro());
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            registerIntentTriviaResponse.setErrorCode(1);
+            registerIntentTriviaResponse.setErrorMessage("Error en procesos");
+        }
+        return registerIntentTriviaResponse;
+    }
 }

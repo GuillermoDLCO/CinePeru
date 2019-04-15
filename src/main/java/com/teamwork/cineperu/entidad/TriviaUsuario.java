@@ -9,7 +9,7 @@ public class TriviaUsuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long codigoTriviaUusuario;
+    private Long codigoTriviaUsuario;
 
     @ManyToOne
     @JoinColumn(name = "codigo_usuario")
@@ -24,12 +24,12 @@ public class TriviaUsuario {
     private boolean estadoRespuesta;
     private boolean estadoCobro;
 
-    public Long getCodigoTriviaUusuario() {
-        return codigoTriviaUusuario;
+    public Long getCodigoTriviaUsuario() {
+        return codigoTriviaUsuario;
     }
 
-    public void setCodigoTriviaUusuario(Long codigoTriviaUusuario) {
-        this.codigoTriviaUusuario = codigoTriviaUusuario;
+    public void setCodigoTriviaUsuario(Long codigoTriviaUsuario) {
+        this.codigoTriviaUsuario = codigoTriviaUsuario;
     }
 
     public Usuario getUsuario() {

@@ -26,7 +26,8 @@ public class PeliculaNegocio {
         getListMovieResponse.setErrorCode(0);
         getListMovieResponse.setErrorMessage("");
         try{
-            if (!usuarioTokenNegocio.validarToken(userTokenRequest)){
+            UsuarioToken usuarioToken = usuarioTokenNegocio.obtenerUsuarioToken(userTokenRequest.getToken());
+            if (usuarioToken == null){
                 getListMovieResponse.setErrorCode(100);
                 getListMovieResponse.setErrorMessage("Credencial de acceso vencida o incorrecta");
                 return getListMovieResponse;
