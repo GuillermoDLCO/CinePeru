@@ -11,11 +11,9 @@ import com.teamwork.cineperu.entidad.response.UserAuthenticateResponse;
 import com.teamwork.cineperu.repositorio.PersonaRepositorio;
 import com.teamwork.cineperu.repositorio.UsuarioRepositorio;
 import com.teamwork.cineperu.repositorio.UsuarioTokenRepositorio;
-import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.rmi.server.UID;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
